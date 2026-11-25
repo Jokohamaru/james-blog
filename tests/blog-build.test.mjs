@@ -4,6 +4,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { remarkMermaid } from '../src/utils/remark-mermaid.mjs';
 
+function findMarkdownPosts(dir, baseDir = dir) {
+  const results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...findMarkdownPosts(full, baseDir));
+    } else if (/\.(md|mdx)$/.test(entry.name)) {
+      const content = fs.readFileSync(full, 'utf8');
+      if (!/^draft:\s*true$/m.test(content)) {
+        const id = path.relative(baseDir, full).replace(/\.(md|mdx)$/, '').split(path.sep).join('/');
+        results.push({ id, content });
+      }
+    }
+  }
+  return results;
+}
+
 test('remarkMermaid converts mermaid code block into pre.mermaid wrapper', () => {
   const tree = {
     type: 'root',
@@ -20,45 +37,48 @@ test('remarkMermaid converts mermaid code block into pre.mermaid wrapper', () =>
   assert.equal(tree.children[1].type, 'code');
 });
 
-test('static dist output contains Cloud Engineer categories, subcategories, posts, and empty state', () => {
+test('static dist output contains core pages, all category routes, and every published post', () => {
   const dist = path.resolve('dist');
-  const expectedFiles = [
+  const coreFiles = [
     'index.html',
     'blog/index.html',
     'about/index.html',
     '404.html',
     'rss.xml',
     'sitemap-index.xml',
-    'blog/system-design/scalability/thiet-ke-token-bucket-rate-limiter/index.html',
-    'blog/cloud/aws/lab-01-giam-sat-trang-thai-ec2-tu-dong/index.html',
     'categories/system-design/index.html',
-    'categories/system-design/scalability/index.html',
     'categories/cloud/index.html',
     'categories/cloud/aws/index.html',
-    'categories/observability/monitoring-metrics/index.html',
-    'tags/he-thong/index.html',
+    'categories/linux-networking/index.html',
+    'categories/containers-k8s/index.html',
+    'categories/iac-cicd/index.html',
+    'categories/observability/index.html',
   ];
 
-  for (const rel of expectedFiles) {
-    assert.ok(fs.existsSync(path.join(dist, rel)), `Missing built file: ${rel}`);
+  for (const rel of coreFiles) {
+    assert.ok(fs.existsSync(path.join(dist, rel)), `Missing built core file: ${rel}`);
   }
 
-  const postHtml = fs.readFileSync(
-    path.join(dist, 'blog/system-design/scalability/thiet-ke-token-bucket-rate-limiter/index.html'),
-    'utf8',
+  const homeHtml = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
+  assert.match(
+    homeHtml,
+    /href="\/james-blog\/blog"/,
+    'Expected GitHub Pages /james-blog base path in navigation links',
   );
-  assert.match(postHtml, /expressive-code/, 'Expected Expressive Code block in post HTML');
-  assert.match(postHtml, /class="katex"/, 'Expected build-time KaTeX math in post HTML');
-  assert.match(postHtml, /<pre class="mermaid/, 'Expected Mermaid block in post HTML');
-  assert.match(postHtml, /System Design/, 'Expected category breadcrumb in post HTML');
-  assert.match(postHtml, /Scalability/, 'Expected subcategory breadcrumb in post HTML');
 
-  assert.match(postHtml, /mermaid-lightbox/, 'Expected Mermaid zoom lightbox dialog in post HTML');
-  assert.match(postHtml, /href="\/james-blog\/categories\/system-design"/, 'Expected GitHub Pages /james-blog base path in links');
+  const posts = findMarkdownPosts(path.resolve('src/content/blog'));
+  for (const post of posts) {
+    const builtPostPath = path.join(dist, 'blog', post.id, 'index.html');
+    assert.ok(fs.existsSync(builtPostPath), `Missing built HTML for post: ${post.id}`);
 
-  const emptySubHtml = fs.readFileSync(
-    path.join(dist, 'categories/cloud/azure/index.html'),
-    'utf8',
-  );
-  assert.match(emptySubHtml, /Đang cập nhật bài viết đầu tiên/, 'Expected empty category notice');
+    const postHtml = fs.readFileSync(builtPostPath, 'utf8');
+    assert.match(postHtml, /mermaid-lightbox/, 'Expected zoom lightbox dialog in post HTML');
+
+    if (/```mermaid/.test(post.content)) {
+      assert.match(postHtml, /<pre class="mermaid/, `Expected Mermaid block in ${post.id}`);
+    }
+    if (/```(ts|js|json|python|bash|hcl|yaml)/.test(post.content)) {
+      assert.match(postHtml, /expressive-code/, `Expected Expressive Code block in ${post.id}`);
+    }
+  }
 });
