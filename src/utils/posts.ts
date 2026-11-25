@@ -44,6 +44,12 @@ export function formatDateVi(date: Date): string {
   }).format(date);
 }
 
+export function withBase(path = ''): string {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const clean = path.replace(/^\/+/, '');
+  return clean ? `${base}/${clean}` : `${base}/`;
+}
+
 export function slugifyTag(tag: string): string {
   return tag
     .normalize('NFD')

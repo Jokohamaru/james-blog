@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { SITE } from '@/consts';
 import { CATEGORIES } from '@/categories';
-import { formatDateVi, getPostTaxonomy, getPublishedPosts } from '@/utils/posts';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts, withBase } from '@/utils/posts';
 
 const allPosts = await getPublishedPosts();
 const latestPosts = allPosts.slice(0, 5);
@@ -45,7 +45,7 @@ for (const post of allPosts) {
               <div>
                 <div class="flex items-baseline justify-between gap-2">
                   <a
-                    href={`/categories/${cat.slug}`}
+                    href={withBase(`categories/${cat.slug}`)}
                     class="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
                   >
                     {cat.label}
@@ -62,7 +62,7 @@ for (const post of allPosts) {
               <div class="mt-3 flex flex-wrap gap-1.5 pt-1">
                 {cat.subcategories.map((sub) => (
                   <a
-                    href={`/categories/${cat.slug}/${sub.slug}`}
+                    href={withBase(`categories/${cat.slug}/${sub.slug}`)}
                     class="rounded bg-zinc-200/60 px-2 py-0.5 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-300/70 hover:text-zinc-900 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
                   >
                     {sub.label}
@@ -82,7 +82,7 @@ for (const post of allPosts) {
         Bài viết mới nhất
       </h2>
       <a
-        href="/blog"
+        href={withBase('blog')}
         class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
       >
         Xem tất cả →
@@ -95,7 +95,7 @@ for (const post of allPosts) {
           const { category, subcategory } = getPostTaxonomy(post.id);
           return (
             <li class="py-5 first:pt-0">
-              <a href={`/blog/${post.id}`} class="group block">
+              <a href={withBase(`blog/${post.id}`)} class="group block">
                 <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4">
                   <div class="flex flex-wrap items-center gap-2">
                     {category && (

@@ -2,7 +2,7 @@
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
-import { formatDateVi, getPostTaxonomy, slugifyTag, type BlogPost } from '@/utils/posts';
+import { formatDateVi, getPostTaxonomy, slugifyTag, withBase, type BlogPost } from '@/utils/posts';
 
 interface Props {
   post: BlogPost;
@@ -26,7 +26,7 @@ const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 3);
           category && (
             <nav aria-label="Danh mục bài viết" class="mb-3 flex flex-wrap items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
               <a
-                href={`/categories/${category.slug}`}
+                href={withBase(`categories/${category.slug}`)}
                 class="rounded bg-zinc-100 px-2 py-0.5 text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800/90 dark:text-zinc-300 dark:hover:bg-zinc-700"
               >
                 {category.label}
@@ -35,7 +35,7 @@ const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 3);
                 <>
                   <span aria-hidden="true">/</span>
                   <a
-                    href={`/categories/${category.slug}/${subcategory.slug}`}
+                    href={withBase(`categories/${category.slug}/${subcategory.slug}`)}
                     class="rounded bg-zinc-100 px-2 py-0.5 text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800/90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     {subcategory.label}
@@ -73,7 +73,7 @@ const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 3);
             <div class="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <a
-                  href={`/tags/${slugifyTag(tag)}`}
+                  href={withBase(`tags/${slugifyTag(tag)}`)}
                   class="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800/90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                 >
                   #{tag}
@@ -98,7 +98,7 @@ const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 3);
           >
             {prevPost ? (
               <a
-                href={`/blog/${prevPost.id}`}
+                href={withBase(`blog/${prevPost.id}`)}
                 class="group rounded-lg border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
               >
                 <span class="text-xs text-zinc-500 dark:text-zinc-400">← Bài cũ hơn</span>
@@ -112,7 +112,7 @@ const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 3);
 
             {nextPost && (
               <a
-                href={`/blog/${nextPost.id}`}
+                href={withBase(`blog/${nextPost.id}`)}
                 class="group rounded-lg border border-zinc-200 p-4 text-left transition-colors hover:border-zinc-400 sm:text-right dark:border-zinc-800 dark:hover:border-zinc-600"
               >
                 <span class="text-xs text-zinc-500 dark:text-zinc-400">Bài mới hơn →</span>

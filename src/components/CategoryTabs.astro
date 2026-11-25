@@ -1,7 +1,7 @@
 ---
 import { CATEGORIES } from '@/categories';
 import type { BlogPost } from '@/utils/posts';
-import { getPostTaxonomy } from '@/utils/posts';
+import { getPostTaxonomy, withBase } from '@/utils/posts';
 
 interface Props {
   posts: BlogPost[];
@@ -31,7 +31,7 @@ const currentCat = CATEGORIES.find((c) => c.slug === activeCategory);
 <div class="space-y-3">
   <nav aria-label="Danh mục chính" class="flex flex-wrap gap-2">
     <a
-      href="/blog"
+      href={withBase('blog')}
       class:list={[
         'inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
         !activeCategory
@@ -51,7 +51,7 @@ const currentCat = CATEGORIES.find((c) => c.slug === activeCategory);
         const count = catCounts.get(cat.slug) ?? 0;
         return (
           <a
-            href={`/categories/${cat.slug}`}
+            href={withBase(`categories/${cat.slug}`)}
             class:list={[
               'inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
               isCurrent
@@ -76,7 +76,7 @@ const currentCat = CATEGORIES.find((c) => c.slug === activeCategory);
         class="flex flex-wrap items-center gap-1.5 border-l-2 border-zinc-200 pl-3 dark:border-zinc-800"
       >
         <a
-          href={`/categories/${currentCat.slug}`}
+          href={withBase(`categories/${currentCat.slug}`)}
           class:list={[
             'rounded-full px-2.5 py-1 text-xs transition-colors',
             !activeSubcategory
@@ -91,7 +91,7 @@ const currentCat = CATEGORIES.find((c) => c.slug === activeCategory);
           const count = subCounts.get(`${currentCat.slug}/${sub.slug}`) ?? 0;
           return (
             <a
-              href={`/categories/${currentCat.slug}/${sub.slug}`}
+              href={withBase(`categories/${currentCat.slug}/${sub.slug}`)}
               class:list={[
                 'rounded-full px-2.5 py-1 text-xs transition-colors',
                 isSubCurrent

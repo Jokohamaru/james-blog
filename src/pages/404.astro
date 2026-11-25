@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withBase } from '@/utils/posts';
 ---
 
 <BaseLayout title="404 — Không tìm thấy trang">
@@ -12,7 +13,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
       Đường dẫn có thể đã thay đổi hoặc bài viết không tồn tại.
     </p>
     <a
-      href="/"
+      href={withBase()}
       class="mt-6 inline-flex items-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
     >
       Quay về trang chủ

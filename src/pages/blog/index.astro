@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CategoryTabs from '@/components/CategoryTabs.astro';
-import { formatDateVi, getPostTaxonomy, getPublishedPosts, slugifyTag } from '@/utils/posts';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts, slugifyTag, withBase } from '@/utils/posts';
 
 const posts = await getPublishedPosts();
 
@@ -38,7 +38,7 @@ const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
           <span class="mr-1 text-xs text-zinc-400 dark:text-zinc-500">Tags:</span>
           {sortedTags.map(([slug, { label, count }]) => (
             <a
-              href={`/tags/${slug}`}
+              href={withBase(`tags/${slug}`)}
               class="inline-flex items-center gap-1 rounded-full border border-zinc-200/80 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
             >
               <span>#{label}</span>
@@ -63,7 +63,7 @@ const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
               return (
                 <li class="py-4 first:pt-0">
                   <a
-                    href={`/blog/${post.id}`}
+                    href={withBase(`blog/${post.id}`)}
                     class="group flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4"
                   >
                     <div class="flex flex-wrap items-center gap-2">

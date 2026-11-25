@@ -30,7 +30,7 @@ test('static dist output contains Cloud Engineer categories, subcategories, post
     'rss.xml',
     'sitemap-index.xml',
     'blog/system-design/scalability/thiet-ke-token-bucket-rate-limiter/index.html',
-    'blog/cloud/other/toi-uu-hieu-nang-blog-ky-thuat-voi-astro-7/index.html',
+    'blog/cloud/aws/lab-01-giam-sat-trang-thai-ec2-tu-dong/index.html',
     'categories/system-design/index.html',
     'categories/system-design/scalability/index.html',
     'categories/cloud/index.html',
@@ -54,6 +54,7 @@ test('static dist output contains Cloud Engineer categories, subcategories, post
   assert.match(postHtml, /Scalability/, 'Expected subcategory breadcrumb in post HTML');
 
   assert.match(postHtml, /mermaid-lightbox/, 'Expected Mermaid zoom lightbox dialog in post HTML');
+  assert.match(postHtml, /href="\/james-blog\/categories\/system-design"/, 'Expected GitHub Pages /james-blog base path in links');
 
   const emptySubHtml = fs.readFileSync(
     path.join(dist, 'categories/cloud/azure/index.html'),

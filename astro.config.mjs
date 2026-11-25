@@ -9,7 +9,8 @@ import rehypeKatex from 'rehype-katex';
 import { remarkMermaid } from './src/utils/remark-mermaid.mjs';
 
 export default defineConfig({
-  site: 'https://james-blog.pages.dev',
+  site: 'https://jokohamaru.github.io',
+  base: '/james-blog',
   integrations: [
     expressiveCode({
       themes: ['github-light', 'github-dark-default'],
