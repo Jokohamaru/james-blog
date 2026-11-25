@@ -7,6 +7,7 @@ export const SITE = {
   email: 'kiennguyen3112@gmail.com',
   socials: {
     github: 'https://github.com/Jokohamaru',
-    linkedin: 'https://linkedin.com/in/your-username',
+    linkedin: 'https://www.linkedin.com/in/kien-nguyen-0b9393298/',
+    portfolio: 'https://james-portfolio-eta-five.vercel.app/',
   },
 } as const;
