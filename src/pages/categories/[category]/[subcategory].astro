@@ -1,0 +1,93 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CategoryTabs from '@/components/CategoryTabs.astro';
+import { CATEGORIES, type CategoryDef, type SubcategoryDef } from '@/categories';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts } from '@/utils/posts';
+
+export function getStaticPaths() {
+  return CATEGORIES.flatMap((category) =>
+    category.subcategories.map((subcategory) => ({
+      params: { category: category.slug, subcategory: subcategory.slug },
+      props: { category, subcategory },
+    })),
+  );
+}
+
+interface Props {
+  category: CategoryDef;
+  subcategory: SubcategoryDef;
+}
+
+const { category, subcategory } = Astro.props;
+const allPosts = await getPublishedPosts();
+const filteredPosts = allPosts.filter((p) => {
+  const tax = getPostTaxonomy(p.id);
+  return tax.category?.slug === category.slug && tax.subcategory?.slug === subcategory.slug;
+});
+---
+
+<BaseLayout
+  title={`${subcategory.label} — ${category.label}`}
+  description={`Các bài viết chuyên sâu về ${subcategory.label} trong danh mục ${category.label}.`}
+>
+  <header class="mb-10">
+    <div class="mb-2 flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+      <a href={`/categories/${category.slug}`} class="hover:text-zinc-900 dark:hover:text-zinc-100">
+        {category.label}
+      </a>
+      <span aria-hidden="true">/</span>
+      <span class="text-zinc-800 dark:text-zinc-200">{subcategory.label}</span>
+    </div>
+
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+      {subcategory.label}
+    </h1>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+      {category.description}
+    </p>
+
+    <div class="mt-6">
+      <CategoryTabs
+        posts={allPosts}
+        activeCategory={category.slug}
+        activeSubcategory={subcategory.slug}
+      />
+    </div>
+  </header>
+
+  {
+    filteredPosts.length > 0 ? (
+      <ul class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+        {filteredPosts.map((post) => (
+          <li class="py-5 first:pt-0">
+            <a href={`/blog/${post.id}`} class="group block">
+              <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+                <h2 class="font-medium text-zinc-900 group-hover:underline dark:text-zinc-100">
+                  {post.data.title}
+                </h2>
+                <time
+                  datetime={post.data.pubDate.toISOString()}
+                  class="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400"
+                >
+                  {formatDateVi(post.data.pubDate)}
+                </time>
+              </div>
+              <p class="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                {post.data.description}
+              </p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="rounded-lg border border-dashed border-zinc-200 px-6 py-12 text-center dark:border-zinc-800">
+        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Đang cập nhật bài viết đầu tiên về {subcategory.label} ({category.label}).
+        </p>
+        <p class="mt-1.5 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          Tạo file mới trong <code>src/content/blog/{category.slug}/{subcategory.slug}/</code> để xuất bản.
+        </p>
+      </div>
+    )
+  }
+</BaseLayout>

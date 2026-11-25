@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CategoryTabs from '@/components/CategoryTabs.astro';
+import { CATEGORIES, type CategoryDef } from '@/categories';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts } from '@/utils/posts';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: CategoryDef;
+}
+
+const { category } = Astro.props;
+const allPosts = await getPublishedPosts();
+const filteredPosts = allPosts.filter((p) => getPostTaxonomy(p.id).category?.slug === category.slug);
+---
+
+<BaseLayout title={category.label} description={category.description}>
+  <header class="mb-10">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+      {category.label}
+    </h1>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+      {category.description}
+    </p>
+
+    <div class="mt-6">
+      <CategoryTabs posts={allPosts} activeCategory={category.slug} />
+    </div>
+  </header>
+
+  {
+    filteredPosts.length > 0 ? (
+      <ul class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+        {filteredPosts.map((post) => {
+          const { subcategory } = getPostTaxonomy(post.id);
+          return (
+            <li class="py-5 first:pt-0">
+              <a href={`/blog/${post.id}`} class="group block">
+                <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+                  <div class="flex flex-wrap items-center gap-2">
+                    {subcategory && (
+                      <span class="rounded bg-zinc-100 px-2 py-0.5 font-mono text-[11px] font-medium text-zinc-600 dark:bg-zinc-800/90 dark:text-zinc-300">
+                        {subcategory.label}
+                      </span>
+                    )}
+                    <h2 class="font-medium text-zinc-900 group-hover:underline dark:text-zinc-100">
+                      {post.data.title}
+                    </h2>
+                  </div>
+                  <time
+                    datetime={post.data.pubDate.toISOString()}
+                    class="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400"
+                  >
+                    {formatDateVi(post.data.pubDate)}
+                  </time>
+                </div>
+                <p class="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {post.data.description}
+                </p>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    ) : (
+      <div class="rounded-lg border border-dashed border-zinc-200 px-6 py-12 text-center dark:border-zinc-800">
+        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Đang cập nhật bài viết đầu tiên cho danh mục {category.label}.
+        </p>
+        <p class="mt-1.5 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          Thêm file Markdown vào <code>src/content/blog/{category.slug}/&lt;nhanh-con&gt;/</code> để xuất bản.
+        </p>
+      </div>
+    )
+  }
+</BaseLayout>

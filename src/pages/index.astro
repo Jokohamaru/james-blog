@@ -1,0 +1,127 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SITE } from '@/consts';
+import { CATEGORIES } from '@/categories';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts } from '@/utils/posts';
+
+const allPosts = await getPublishedPosts();
+const latestPosts = allPosts.slice(0, 5);
+
+const catCounts = new Map<string, number>();
+for (const post of allPosts) {
+  const { category } = getPostTaxonomy(post.id);
+  if (category) {
+    catCounts.set(category.slug, (catCounts.get(category.slug) ?? 0) + 1);
+  }
+}
+---
+
+<BaseLayout>
+  <section class="mb-12">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+      Xin chào, mình là {SITE.author}.
+    </h1>
+    <p class="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+      {SITE.description} Mình xây dựng trang này như một kho kiến thức mở để hệ thống hóa nền tảng hạ tầng đám mây từ lý thuyết đến triển khai thực tế.
+    </p>
+  </section>
+
+  <section class="mb-14">
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        Chủ đề trọng tâm
+      </h2>
+      <span class="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+        6 danh mục Cloud Engineering
+      </span>
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-2">
+      {
+        CATEGORIES.map((cat) => {
+          const count = catCounts.get(cat.slug) ?? 0;
+          return (
+            <div class="flex flex-col justify-between rounded-lg border border-zinc-200/90 bg-zinc-50/40 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:border-zinc-700">
+              <div>
+                <div class="flex items-baseline justify-between gap-2">
+                  <a
+                    href={`/categories/${cat.slug}`}
+                    class="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
+                  >
+                    {cat.label}
+                  </a>
+                  <span class="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                    {count} bài viết
+                  </span>
+                </div>
+                <p class="mt-1.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {cat.description}
+                </p>
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-1.5 pt-1">
+                {cat.subcategories.map((sub) => (
+                  <a
+                    href={`/categories/${cat.slug}/${sub.slug}`}
+                    class="rounded bg-zinc-200/60 px-2 py-0.5 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-300/70 hover:text-zinc-900 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+                  >
+                    {sub.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <section>
+    <div class="mb-6 flex items-baseline justify-between">
+      <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        Bài viết mới nhất
+      </h2>
+      <a
+        href="/blog"
+        class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+      >
+        Xem tất cả →
+      </a>
+    </div>
+
+    <ul class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+      {
+        latestPosts.map((post) => {
+          const { category, subcategory } = getPostTaxonomy(post.id);
+          return (
+            <li class="py-5 first:pt-0">
+              <a href={`/blog/${post.id}`} class="group block">
+                <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+                  <div class="flex flex-wrap items-center gap-2">
+                    {category && (
+                      <span class="rounded bg-zinc-100 px-2 py-0.5 font-mono text-[11px] font-medium text-zinc-600 dark:bg-zinc-800/90 dark:text-zinc-300">
+                        {subcategory ? `${category.label} / ${subcategory.label}` : category.label}
+                      </span>
+                    )}
+                    <h3 class="font-medium text-zinc-900 group-hover:underline dark:text-zinc-100">
+                      {post.data.title}
+                    </h3>
+                  </div>
+                  <time
+                    datetime={post.data.pubDate.toISOString()}
+                    class="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400"
+                  >
+                    {formatDateVi(post.data.pubDate)}
+                  </time>
+                </div>
+                <p class="mt-1.5 line-clamp-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {post.data.description}
+                </p>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </section>
+</BaseLayout>

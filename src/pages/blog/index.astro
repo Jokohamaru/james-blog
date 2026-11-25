@@ -1,0 +1,94 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CategoryTabs from '@/components/CategoryTabs.astro';
+import { formatDateVi, getPostTaxonomy, getPublishedPosts, slugifyTag } from '@/utils/posts';
+
+const posts = await getPublishedPosts();
+
+const tagCounts = new Map<string, { label: string; count: number }>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    const slug = slugifyTag(tag);
+    const prev = tagCounts.get(slug);
+    tagCounts.set(slug, { label: prev?.label ?? tag, count: (prev?.count ?? 0) + 1 });
+  }
+}
+const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => b[1].count - a[1].count);
+
+const postsByYear = Map.groupBy(posts, (post) => post.data.pubDate.getFullYear());
+const years = Array.from(postsByYear.keys()).sort((a, b) => b - a);
+---
+
+<BaseLayout title="Bài viết" description="Tất cả bài viết kỹ thuật theo lộ trình Cloud Engineer.">
+  <header class="mb-10">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+      Bài viết
+    </h1>
+    <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      Tổng cộng {posts.length} bài viết phân loại theo 6 mảng kiến thức Cloud Engineering.
+    </p>
+
+    <div class="mt-6">
+      <CategoryTabs posts={posts} />
+    </div>
+
+    {
+      sortedTags.length > 0 && (
+        <div class="mt-4 flex flex-wrap items-center gap-1.5" aria-label="Lọc theo thẻ từ khóa">
+          <span class="mr-1 text-xs text-zinc-400 dark:text-zinc-500">Tags:</span>
+          {sortedTags.map(([slug, { label, count }]) => (
+            <a
+              href={`/tags/${slug}`}
+              class="inline-flex items-center gap-1 rounded-full border border-zinc-200/80 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
+            >
+              <span>#{label}</span>
+              <span class="text-zinc-400 dark:text-zinc-500">{count}</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </header>
+
+  <div class="space-y-12">
+    {
+      years.map((year) => (
+        <section>
+          <h2 class="mb-4 font-mono text-sm font-semibold text-zinc-400 dark:text-zinc-500">
+            {year}
+          </h2>
+          <ul class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70">
+            {postsByYear.get(year)?.map((post) => {
+              const { category, subcategory } = getPostTaxonomy(post.id);
+              return (
+                <li class="py-4 first:pt-0">
+                  <a
+                    href={`/blog/${post.id}`}
+                    class="group flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+                  >
+                    <div class="flex flex-wrap items-center gap-2">
+                      {category && (
+                        <span class="rounded bg-zinc-100 px-2 py-0.5 font-mono text-[11px] font-medium text-zinc-600 dark:bg-zinc-800/90 dark:text-zinc-300">
+                          {subcategory ? `${category.label} / ${subcategory.label}` : category.label}
+                        </span>
+                      )}
+                      <span class="font-medium text-zinc-900 group-hover:underline dark:text-zinc-100">
+                        {post.data.title}
+                      </span>
+                    </div>
+                    <time
+                      datetime={post.data.pubDate.toISOString()}
+                      class="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400"
+                    >
+                      {formatDateVi(post.data.pubDate)}
+                    </time>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

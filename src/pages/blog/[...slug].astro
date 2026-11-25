@@ -1,0 +1,38 @@
+---
+import { render } from 'astro:content';
+import PostLayout from '@/layouts/PostLayout.astro';
+import { estimateReadingTime, getPublishedPosts, type BlogPost } from '@/utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      // posts được sắp xếp mới -> cũ: bài cũ hơn ở index + 1, bài mới hơn ở index - 1
+      prevPost: posts[index + 1],
+      nextPost: posts[index - 1],
+    },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+  prevPost?: BlogPost;
+  nextPost?: BlogPost;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings } = await render(post);
+const readingMinutes = estimateReadingTime(post.body);
+---
+
+<PostLayout
+  post={post}
+  headings={headings}
+  readingMinutes={readingMinutes}
+  prevPost={prevPost}
+  nextPost={nextPost}
+>
+  <Content />
+</PostLayout>

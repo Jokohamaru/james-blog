@@ -1,0 +1,42 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SITE } from '@/consts';
+---
+
+<BaseLayout title="Giới thiệu" description={`Giới thiệu về ${SITE.author} và hành trình trở thành Cloud Engineer.`}>
+  <article class="prose dark:prose-invert">
+    <h1>Giới thiệu</h1>
+    <p>
+      Xin chào! Mình là <strong>{SITE.author}</strong> — đang trên hành trình học tập chuyên sâu và xây dựng sự nghiệp ở vị trí <strong>Cloud Engineer</strong>.
+    </p>
+    <p>
+      Trang blog này là cuốn sổ tay kỹ thuật nơi mình hệ thống hóa kiến thức, ghi lại các bài lab thực hành, kiến trúc tham chiếu và kinh nghiệm xử lý sự cố xoay quanh 6 mảng cốt lõi:
+    </p>
+    <ul>
+      <li><strong>System Design</strong>: Thiết kế kiến trúc, hệ thống phân tán, cơ sở dữ liệu và bài toán chịu tải cao.</li>
+      <li><strong>Cloud Platforms</strong>: Triển khai hạ tầng trên AWS, Microsoft Azure, Google Cloud (GCP) và đa đám mây.</li>
+      <li><strong>Linux &amp; Networking</strong>: Quản trị nhân Linux, mạng TCP/IP, DNS, Reverse Proxy / Load Balancing và bảo mật.</li>
+      <li><strong>Containers &amp; Kubernetes</strong>: Đóng gói Docker, vận hành cụm Kubernetes, Helm và Service Mesh.</li>
+      <li><strong>IaC &amp; CI/CD</strong>: Hạ tầng dưới dạng mã nguồn với Terraform, đường ống CI/CD tự động hóa và GitOps.</li>
+      <li><strong>Observability &amp; Monitoring</strong>: Giám sát Metrics (Prometheus/Grafana), tập trung hóa Logging, Tracing và cảnh báo sự cố.</li>
+    </ul>
+
+    <h2>Về trang web này</h2>
+    <p>
+      Blog được xây dựng tĩnh hoàn toàn bằng <strong>Astro 7</strong> và <strong>Tailwind CSS</strong>, tổ chức bài viết theo đúng cây thư mục danh mục trong Git repository, hỗ trợ hiển thị mã nguồn, sơ đồ kiến trúc Mermaid và công thức toán KaTeX.
+    </p>
+
+    <h2>Kết nối</h2>
+    <ul>
+      <li>
+        Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </li>
+      <li>
+        GitHub: <a href={SITE.socials.github} target="_blank" rel="noopener noreferrer">{SITE.socials.github}</a>
+      </li>
+      <li>
+        LinkedIn: <a href={SITE.socials.linkedin} target="_blank" rel="noopener noreferrer">{SITE.socials.linkedin}</a>
+      </li>
+    </ul>
+  </article>
+</BaseLayout>
