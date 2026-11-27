@@ -44,7 +44,6 @@ test('static dist output contains core pages, all category routes, and every pub
     'blog/index.html',
     'about/index.html',
     '404.html',
-    'rss.xml',
     'sitemap-index.xml',
     'categories/system-design/index.html',
     'categories/cloud/index.html',

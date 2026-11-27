@@ -1,6 +1,5 @@
 ---
 import { SITE } from '@/consts';
-import { withBase } from '@/utils/posts';
 
 const year = new Date().getFullYear();
 ---
@@ -32,9 +31,6 @@ const year = new Date().getFullYear();
         class="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
       >
         Portfolio
-      </a>
-      <a href={withBase('rss.xml')} class="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
-        RSS
       </a>
     </div>
   </div>
